@@ -1,0 +1,25 @@
+package com.chobolevel.logging.config;
+
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+@Data
+@ConfigurationProperties(prefix = "logging-sdk")
+public class LoggingSdkProperties {
+
+    private EncoderType encoder = EncoderType.PLAIN;
+    private boolean async = false;
+    private int asyncQueueSize = 1000;
+    private FileProperties file = new FileProperties();
+
+    public enum EncoderType {
+        JSON, PLAIN
+    }
+
+    @Data
+    public static class FileProperties {
+        private boolean enabled = false;
+        private String directory = "logs";
+        private String pattern = "app-%s.log";
+    }
+}
