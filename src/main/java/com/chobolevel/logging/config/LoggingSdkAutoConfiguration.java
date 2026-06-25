@@ -2,6 +2,7 @@ package com.chobolevel.logging.config;
 
 import ch.qos.logback.classic.LoggerContext;
 import com.chobolevel.logging.appender.AsyncBufferedAppender;
+import com.chobolevel.logging.appender.CompositeAppender;
 import com.chobolevel.logging.appender.ConsoleAppender;
 import com.chobolevel.logging.appender.FileRollingAppender;
 import com.chobolevel.logging.appender.LogAppender;
@@ -16,6 +17,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 @AutoConfiguration
 @EnableConfigurationProperties(LoggingSdkProperties.class)
@@ -34,15 +37,22 @@ public class LoggingSdkAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public LogAppender logAppender(LoggingSdkProperties props) {
-        LogAppender base;
+        List<LogAppender> bases = new ArrayList<>();
+
+        if (props.getConsole().isEnabled()) {
+            bases.add(new ConsoleAppender());
+        }
         if (props.getFile().isEnabled()) {
-            base = new FileRollingAppender(
+            bases.add(new FileRollingAppender(
                     Paths.get(props.getFile().getDirectory()),
                     props.getFile().getPattern()
-            );
-        } else {
-            base = new ConsoleAppender();
+            ));
         }
+        if (bases.isEmpty()) {
+            bases.add(new ConsoleAppender());
+        }
+
+        LogAppender base = bases.size() == 1 ? bases.get(0) : new CompositeAppender(bases);
 
         if (props.isAsync()) {
             AsyncBufferedAppender asyncAppender = new AsyncBufferedAppender(base, props.getAsyncQueueSize());

@@ -10,10 +10,16 @@ public class LoggingSdkProperties {
     private EncoderType encoder = EncoderType.PLAIN;
     private boolean async = false;
     private int asyncQueueSize = 1000;
+    private ConsoleProperties console = new ConsoleProperties();
     private FileProperties file = new FileProperties();
 
     public enum EncoderType {
         JSON, PLAIN
+    }
+
+    @Data
+    public static class ConsoleProperties {
+        private boolean enabled = true;
     }
 
     @Data

@@ -1,6 +1,7 @@
 package com.chobolevel.logging.config;
 
 import com.chobolevel.logging.appender.AsyncBufferedAppender;
+import com.chobolevel.logging.appender.CompositeAppender;
 import com.chobolevel.logging.appender.ConsoleAppender;
 import com.chobolevel.logging.appender.LogAppender;
 import com.chobolevel.logging.encoder.JsonEncoder;
@@ -55,6 +56,24 @@ class LoggingSdkAutoConfigurationTest {
                 .run(ctx -> {
                     assertThat(ctx.getBean(LogAppender.class)).isInstanceOf(CustomAppenderConfig.CustomAppender.class);
                 });
+    }
+
+    @Test
+    void consoleAndFileEnabled_wrapsInCompositeAppender() {
+        runner.withPropertyValues(
+                "logging-sdk.console.enabled=true",
+                "logging-sdk.file.enabled=true",
+                "logging-sdk.file.directory=/tmp/logging-sdk-test"
+        ).run(ctx -> assertThat(ctx.getBean(LogAppender.class)).isInstanceOf(CompositeAppender.class));
+    }
+
+    @Test
+    void consoleDisabled_fileEnabled_returnsSingleAppender() {
+        runner.withPropertyValues(
+                "logging-sdk.console.enabled=false",
+                "logging-sdk.file.enabled=true",
+                "logging-sdk.file.directory=/tmp/logging-sdk-test"
+        ).run(ctx -> assertThat(ctx.getBean(LogAppender.class)).isNotInstanceOf(CompositeAppender.class));
     }
 
     @Test
