@@ -36,21 +36,21 @@ public class LoggingSdkAutoConfiguration {
     public LogAppender logAppender(LoggingSdkProperties props) {
         LogAppender base;
         if (props.getFile().isEnabled()) {
-            FileRollingAppender fileAppender = new FileRollingAppender(
+            base = new FileRollingAppender(
                     Paths.get(props.getFile().getDirectory()),
                     props.getFile().getPattern()
             );
-            fileAppender.start();
-            base = fileAppender;
         } else {
             base = new ConsoleAppender();
         }
 
         if (props.isAsync()) {
             AsyncBufferedAppender asyncAppender = new AsyncBufferedAppender(base, props.getAsyncQueueSize());
-            asyncAppender.start();
+            asyncAppender.start(); // internally calls delegate.start()
             return asyncAppender;
         }
+
+        base.start();
         return base;
     }
 
