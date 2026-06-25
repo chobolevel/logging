@@ -7,12 +7,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class AsyncBufferedAppender implements LogAppender, DisposableBean {
 
     private final LogAppender delegate;
     private final BlockingQueue<String> queue;
     private final ExecutorService executor;
+    private final AtomicLong droppedCount = new AtomicLong(0);
     private volatile boolean running = false;
 
     public AsyncBufferedAppender(LogAppender delegate, int queueSize) {
@@ -56,8 +58,12 @@ public class AsyncBufferedAppender implements LogAppender, DisposableBean {
     @Override
     public void append(String encoded) {
         if (!queue.offer(encoded)) {
-            // queue full — drop to prevent backpressure on caller
+            droppedCount.incrementAndGet();
         }
+    }
+
+    public long getDroppedCount() {
+        return droppedCount.get();
     }
 
     private void drainLoop() {

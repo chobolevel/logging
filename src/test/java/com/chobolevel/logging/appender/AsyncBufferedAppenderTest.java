@@ -52,6 +52,26 @@ class AsyncBufferedAppenderTest {
     }
 
     @Test
+    void append_whenQueueFull_incrementsDroppedCount() throws InterruptedException {
+        LogAppender blockingDelegate = encoded -> {
+            try { Thread.sleep(200); } catch (InterruptedException ignored) {}
+        };
+
+        AsyncBufferedAppender async = new AsyncBufferedAppender(blockingDelegate, 1);
+        async.start();
+
+        // drain thread immediately picks up one item; fill + overflow the queue
+        Thread.sleep(50);
+        for (int i = 0; i < 10; i++) {
+            async.append("msg" + i);
+        }
+
+        assertThat(async.getDroppedCount()).isGreaterThan(0);
+
+        async.stop();
+    }
+
+    @Test
     void stop_flushesPendingMessages() throws InterruptedException {
         List<String> received = new ArrayList<>();
         CountDownLatch latch = new CountDownLatch(5);
