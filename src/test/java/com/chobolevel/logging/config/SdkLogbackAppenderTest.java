@@ -36,7 +36,7 @@ class SdkLogbackAppenderTest {
         LogAppender logAppender = encoded -> capturedEncoded.add(encoded);
 
         LoggerContext ctx = (LoggerContext) LoggerFactory.getILoggerFactory();
-        appender = new SdkLogbackAppender(encoder, logAppender);
+        appender = new SdkLogbackAppender(encoder, logAppender, List.of());
         appender.setName("TEST_SDK");
         appender.setContext(ctx);
         appender.start();

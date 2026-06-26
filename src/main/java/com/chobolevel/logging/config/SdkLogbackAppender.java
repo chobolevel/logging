@@ -5,6 +5,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.classic.spi.StackTraceElementProxy;
 import ch.qos.logback.core.AppenderBase;
+import com.chobolevel.logging.appender.AlertAppender;
 import com.chobolevel.logging.appender.LogAppender;
 import com.chobolevel.logging.core.LogLevel;
 import com.chobolevel.logging.core.LogRecord;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.DisposableBean;
 
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
@@ -22,10 +24,12 @@ public class SdkLogbackAppender extends AppenderBase<ILoggingEvent> implements D
 
     private final LogEncoder logEncoder;
     private final LogAppender logAppender;
+    private final List<AlertAppender> alertAppenders;
 
-    public SdkLogbackAppender(LogEncoder logEncoder, LogAppender logAppender) {
+    public SdkLogbackAppender(LogEncoder logEncoder, LogAppender logAppender, List<AlertAppender> alertAppenders) {
         this.logEncoder = logEncoder;
         this.logAppender = logAppender;
+        this.alertAppenders = alertAppenders != null ? alertAppenders : List.of();
     }
 
     @Override
@@ -33,11 +37,13 @@ public class SdkLogbackAppender extends AppenderBase<ILoggingEvent> implements D
         LogRecord record = toLogRecord(event);
         String encoded = logEncoder.encode(record);
         logAppender.append(encoded);
+        alertAppenders.forEach(a -> a.send(record));
     }
 
     @Override
     public void destroy() {
         stop();
+        alertAppenders.forEach(AlertAppender::stop);
         LoggerContext ctx = (LoggerContext) LoggerFactory.getILoggerFactory();
         ctx.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME).detachAppender(getName());
     }

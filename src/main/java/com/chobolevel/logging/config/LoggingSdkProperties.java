@@ -1,5 +1,6 @@
 package com.chobolevel.logging.config;
 
+import com.chobolevel.logging.core.LogLevel;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -12,6 +13,7 @@ public class LoggingSdkProperties {
     private int asyncQueueSize = 1000;
     private ConsoleProperties console = new ConsoleProperties();
     private FileProperties file = new FileProperties();
+    private SlackProperties slack = new SlackProperties();
 
     public enum EncoderType {
         JSON, PLAIN
@@ -27,5 +29,12 @@ public class LoggingSdkProperties {
         private boolean enabled = false;
         private String directory = "logs";
         private String pattern = "app-%s.log";
+    }
+
+    @Data
+    public static class SlackProperties {
+        private boolean enabled = false;
+        private String webhookUrl;
+        private LogLevel minLevel = LogLevel.ERROR;
     }
 }
