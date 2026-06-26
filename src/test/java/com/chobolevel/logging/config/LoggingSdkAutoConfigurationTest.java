@@ -4,6 +4,7 @@ import com.chobolevel.logging.appender.AsyncBufferedAppender;
 import com.chobolevel.logging.appender.CompositeAppender;
 import com.chobolevel.logging.appender.ConsoleAppender;
 import com.chobolevel.logging.appender.LogAppender;
+import com.chobolevel.logging.core.LogRecord;
 import com.chobolevel.logging.encoder.JsonEncoder;
 import com.chobolevel.logging.encoder.LogEncoder;
 import com.chobolevel.logging.encoder.PlainTextEncoder;
@@ -45,17 +46,13 @@ class LoggingSdkAutoConfigurationTest {
     @Test
     void customLogEncoder_takesOverAutoConfigured() {
         runner.withUserConfiguration(CustomEncoderConfig.class)
-                .run(ctx -> {
-                    assertThat(ctx.getBean(LogEncoder.class)).isInstanceOf(CustomEncoderConfig.CustomEncoder.class);
-                });
+                .run(ctx -> assertThat(ctx.getBean(LogEncoder.class)).isInstanceOf(CustomEncoderConfig.CustomEncoder.class));
     }
 
     @Test
     void customLogAppender_takesOverAutoConfigured() {
         runner.withUserConfiguration(CustomAppenderConfig.class)
-                .run(ctx -> {
-                    assertThat(ctx.getBean(LogAppender.class)).isInstanceOf(CustomAppenderConfig.CustomAppender.class);
-                });
+                .run(ctx -> assertThat(ctx.getBean(LogAppender.class)).isInstanceOf(CustomAppenderConfig.CustomAppender.class));
     }
 
     @Test
@@ -88,7 +85,7 @@ class LoggingSdkAutoConfigurationTest {
 
         static class CustomEncoder implements LogEncoder {
             @Override
-            public String encode(com.chobolevel.logging.core.LogRecord record) {
+            public String encode(LogRecord record) {
                 return "custom:" + record.getMessage();
             }
         }

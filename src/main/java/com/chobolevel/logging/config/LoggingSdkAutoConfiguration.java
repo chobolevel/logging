@@ -1,5 +1,6 @@
 package com.chobolevel.logging.config;
 
+import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import com.chobolevel.logging.appender.AlertAppender;
 import com.chobolevel.logging.appender.AsyncBufferedAppender;
@@ -59,7 +60,7 @@ public class LoggingSdkAutoConfiguration {
 
         if (props.isAsync()) {
             AsyncBufferedAppender asyncAppender = new AsyncBufferedAppender(base, props.getAsyncQueueSize());
-            asyncAppender.start(); // internally calls delegate.start()
+            asyncAppender.start();
             return asyncAppender;
         }
 
@@ -82,7 +83,7 @@ public class LoggingSdkAutoConfiguration {
     public SdkLogbackAppender sdkLogbackAppender(LogEncoder logEncoder, LogAppender logAppender,
                                                   List<AlertAppender> alertAppenders) {
         LoggerContext ctx = (LoggerContext) LoggerFactory.getILoggerFactory();
-        ch.qos.logback.classic.Logger rootLogger = ctx.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+        Logger rootLogger = ctx.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
 
         rootLogger.detachAppender("LOGGING_SDK");
 

@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
-// DisposableBean: 빈 소멸 시점에 특정 동작을 하고 싶은 경우 구현하는 인터페이스
 public class SdkLogbackAppender extends AppenderBase<ILoggingEvent> implements DisposableBean {
 
     private final LogEncoder logEncoder;
