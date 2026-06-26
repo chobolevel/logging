@@ -96,23 +96,6 @@ dependencies {
 
 > JitPack 페이지: https://jitpack.io/#chobolevel/logging/v1.0.0
 
-### 로컬 빌드
-
-```bash
-./gradlew publishToMavenLocal
-```
-
-```groovy
-repositories {
-    mavenLocal()
-    mavenCentral()
-}
-
-dependencies {
-    implementation 'com.chobolevel:logging-sdk:1.0.0'
-}
-```
-
 ---
 
 ## 설정
