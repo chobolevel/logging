@@ -88,6 +88,7 @@ class AsyncBufferedAppenderTest {
             async.append("item" + i);
         }
 
+        // drainLoop에서 append를 모두 처리를 할 수 있어서 stop 없이 테스트가 성공하는 문제
         async.stop();
 
         assertThat(received).hasSize(5);
